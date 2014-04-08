@@ -26,7 +26,7 @@
 import sys
 import re
 
-RULEID_PATTERN = ":([A-Z][0-9]{4}): ?\*?(.*?)\*?$"
+RULEID_PATTERN = r":.*?\(([A-Z][0-9]{4})\): ?\*?(.*?)\*?$"
 
 def parseNextRule(lines):
     ruleid, rulename = grabIdAndName(lines)
@@ -63,7 +63,7 @@ def grabDescr(lines):
 
 
 def header():
-    return ('<?xml version="1.0" encoding="ASCII"?>\n'
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<rules>\n')
 
 
@@ -82,15 +82,30 @@ class Rule:
 
     def toxml(self):
         rid = self.ruleid
+
+        if rid.startswith('F'): # Fatal
+            priority = 'BLOCKER'
+        elif rid.startswith('E'): # Error
+            priority = 'CRITICAL'
+        elif rid.startswith('W'): # Warning
+            priority = 'MAJOR'
+        elif rid.startswith('R'): # Refactor
+            priority = 'MINOR'
+        elif rid.startswith('C'): # Conventions, Coding style
+            priority = 'MINOR'
+        else: # For all other message types
+            priority = 'INFO'
+
         return ("<rule>\n"
-                "<key>%s</key>\n"
-                "<name><![CDATA[%s]]></name>\n"
-                "<configKey>%s</configKey>\n"
-                "<description>\n"
-                "<![CDATA[%s]]>\n"
-                "</description>\n"
+                "  <key>%s</key>\n"
+                "  <name><![CDATA[%s]]></name>\n"
+                "  <configKey>%s</configKey>\n"
+                "  <description>\n"
+                "  <![CDATA[%s]]>\n"
+                "  </description>\n"
+                "  <priority>%s</priority>"
                 "</rule>\n"
-                % (self.ruleid, self.rulename, self.ruleid, self.ruledescr))
+                % (self.ruleid, self.rulename, self.ruleid, self.ruledescr, priority))
 
 
 lines = sys.stdin.readlines()

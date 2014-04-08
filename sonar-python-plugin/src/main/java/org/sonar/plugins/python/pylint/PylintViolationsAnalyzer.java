@@ -61,7 +61,8 @@ public class PylintViolationsAnalyzer {
   };
 
   private static final String FALLBACK_PYLINT = "pylint";
-  private static final String[] ARGS = {"-i", "y", "-f", "parseable", "-r", "n"};
+  //private static final String[] ARGS = {"-i", "y", "-f", "parseable", "-r", "n"};
+  private static final String[] ARGS = {"--msg-template='{path}:{line}: [{msg_id}, {symbol}, {obj}] {msg}'", "-r", "n"};
   private static final Pattern PATTERN = Pattern.compile("(.+):([0-9]+): \\[(.*)\\] (.*)");
 
   private String pylint = null;
